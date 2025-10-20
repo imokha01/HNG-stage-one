@@ -1,9 +1,8 @@
 import { Router } from "express";
+import { test } from "../controllers/controller.js";
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.send('Hello from the router!');
-});
+router.get('/', test);
 
 export default router;
