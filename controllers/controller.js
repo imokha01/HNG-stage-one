@@ -94,7 +94,7 @@ export const createString = (req, res) => {
       },
       createdAt: new Date().toISOString()
     };
-    storedStrings.set(value, resData);
+    storedStrings.set(normalizedValue, resData);
 
     info("String entry created successfully".green);
     res.status(201).json(resData);
