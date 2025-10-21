@@ -259,3 +259,118 @@ export const getStringsQuery = (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getStringsByLanguage = (req, res) => {
+  try {
+    info("Processing request to retrieve strings by natural language query".blue);
+
+    const { query } = req.query;
+
+    if (!query || typeof query !== "string" || !query.trim()) {
+      warn("400 Bad Request: Invalid query parameter values or types".red);
+      return res
+        .status(400)
+        .json({ error: "400 Bad Request: Invalid query parameter values or types" });
+    }
+
+    // --- Natural language parser ---
+    function parseNaturalQuery(q) {
+      const filters = {};
+      const text = q.toLowerCase();
+
+      // Detect palindrome references
+      if (text.includes("palindromic") || text.includes("palindrome")) {
+        filters.is_palindrome = true;
+      }
+
+      // Detect single word
+      if (text.includes("single word") || text.includes("one word")) {
+        filters.word_count = 1;
+      }
+
+      // Match lengths like longer than 5 or shorter than 10
+      const longerMatch = text.match(/longer than (\d+)/);
+      const shorterMatch = text.match(/shorter than (\d+)/);
+
+      // Match specific letter references like contains letter a
+      const charMatch = text.match(/letter\s+([a-z])/);
+
+      if (longerMatch) filters.min_length = Number(longerMatch[1]) + 1;
+      if (shorterMatch) filters.max_length = Number(shorterMatch[1]) - 1;
+      if (charMatch) filters.contains_character = charMatch[1];
+
+      if (filters.min_length && filters.max_length && filters.min_length > filters.max_length) {
+        throw { status: 422, message: "Query parsed but resulted in conflicting filters" };
+      }
+
+      if (Object.keys(filters).length === 0) {
+        throw { status: 400, message: "Unable to parse natural language query" };
+      }
+
+      return filters;
+    }
+
+    const parsedFilters = parseNaturalQuery(query);
+    const storedStrings = readStorage();
+    const stringsArray = Object.values(storedStrings);
+
+    info("Applying parsed filters".blue);
+
+    // --- Apply filters properly ---
+    const filteredResults = stringsArray.filter(entry => {
+      const { value, properties } = entry;
+      const val = value.toLowerCase();
+
+      if (parsedFilters.is_palindrome !== undefined) {
+        if (properties.is_palindrome !== parsedFilters.is_palindrome) return false;
+      }
+
+      if (parsedFilters.word_count !== undefined) {
+        if (Number(properties.word_count) !== Number(parsedFilters.word_count)) return false;
+      }
+
+      if (parsedFilters.min_length !== undefined) {
+        if (properties.length < parsedFilters.min_length) return false;
+      }
+
+      if (parsedFilters.max_length !== undefined) {
+        if (properties.length > parsedFilters.max_length) return false;
+      }
+
+      if (parsedFilters.contains_character !== undefined) {
+        const char = parsedFilters.contains_character.toLowerCase();
+        if (!val.includes(char)) return false;
+      }
+
+      return true;
+    });
+
+    // --- No matches ---
+    if (filteredResults.length === 0) {
+      warn("No matching strings found for the given natural query".red);
+      return res.status(404).json({ error: "No matching strings found for the given natural language query" });
+    }
+
+    // --- Construct response ---
+    const response = {
+      data: filteredResults.map(entry => ({
+        id: entry.id,
+        value: entry.value,
+        properties: entry.properties,
+        createdAt: entry.createdAt
+      })),
+      count: filteredResults.length,
+      interpreted_query: {
+        original: query,
+        parsed_filters: parsedFilters
+      }
+    };
+
+    info("Natural language query processed successfully".green);
+    res.status(200).json(response);
+
+  } catch (error) {
+    warn("Internal Server Error ".red);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
