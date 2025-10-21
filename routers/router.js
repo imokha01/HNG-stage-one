@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { createString, test } from "../controllers/controller.js";
+import { createString, getStrings } from "../controllers/controller.js";
 
 const router = Router();
 
-router.get('/', test);
+router.post('/', createString);
 
-router.post('/strings', createString);
+router.get('/:value', getStrings);
 
 export default router;

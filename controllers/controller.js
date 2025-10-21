@@ -1,12 +1,30 @@
 import crypto from "crypto";
 import { info, error, warn } from "../utils/logger.js";
 import colors from "colors";
+import fs from "fs";
+import path from "path";
 
 export const test = (req, res) => {
   res.send("Hello from the controller!");
 };
 
-const storedStrings = new Map();
+const storagePath = path.resolve("./stringsStore.json");
+
+// In-memory storage for strings
+if (!fs.existsSync(storagePath)) {
+  fs.writeFileSync(storagePath, JSON.stringify({}), "utf-8");
+}
+
+// Helper: read storage from file
+function readStorage() {
+  const data = fs.readFileSync(storagePath, "utf-8");
+  return JSON.parse(data);
+}
+
+// Helper: write storage to file
+function writeStorage(data) {
+  fs.writeFileSync(storagePath, JSON.stringify(data, null, 2), "utf-8");
+} 
 
 export const createString = (req, res) => {
   try {
@@ -31,8 +49,10 @@ export const createString = (req, res) => {
     }
 
     //! Check for duplicate string entries
+    const storedStrings = readStorage();
     const normalizedValue = value.toLowerCase();
-    if (storedStrings.has(value)) {
+
+    if (storedStrings[normalizedValue]) {
       warn("Conflict: String already exists in the system".red);
       return res
         .status(409)
@@ -43,7 +63,7 @@ export const createString = (req, res) => {
 
     const uuid = crypto.randomUUID();
 
-    const hash = crypto.createHash("sha256").update(uuid).digest("hex");
+    const hash = crypto.createHash("sha256").update(value).digest("hex");
 
     //TODO:  Create the string properties functions
 
@@ -94,12 +114,56 @@ export const createString = (req, res) => {
       },
       createdAt: new Date().toISOString()
     };
-    storedStrings.set(normalizedValue, resData);
+
+    // Store the new string entry
+    storedStrings[normalizedValue] = resData ;
+    writeStorage(storedStrings);
 
     info("String entry created successfully".green);
     res.status(201).json(resData);
   } catch (error) {
     warn("Internal Server Error".red);
     res.status(500).json({ error: "Internal Server Error" });
+  
+  }
+};
+
+export const getStrings = (req, res) => {
+  
+  // Search for the string entry
+  try {
+    info("Processing request to retrieve string entries".blue);
+    const { value } = req.params; 
+
+    // Normalize the input value
+    const data = value.toLowerCase().replace(/[^a-z_0-9]/g, " ");
+    const newValue = data.split("").join("");
+    console.log(newValue)
+
+    //Validate the presence of 'value' parameter
+        if (!newValue) {
+      warn("Missing string value in request params".red);
+      return res.status(400).json({ error: "Missing string value in request parameters" });
+    }
+
+  
+    info("Searching for string entry".blue);
+    const normalizedValue = newValue.toLowerCase();
+    const storedStrings = readStorage();
+
+    // Check if the string entry exists
+    if (!storedStrings[normalizedValue]) {
+      warn(" String does not exist in the system".red);
+      return res.status(404).json({ error: " String does not exist in the system" })
+    } 
+    const stringData = storedStrings[normalizedValue];
+
+    info("String entry found".green);
+    return res.status(200).json(stringData);
+
+  } catch (error) {
+    warn("Internal Server Error".red);
+    res.status(500).json({ error: "Internal Server Error" });
+
   }
 };
