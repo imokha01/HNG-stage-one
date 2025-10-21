@@ -136,8 +136,8 @@ export const getStrings = (req, res) => {
     const { value } = req.params; 
 
     // Normalize the input value
-    const data = value.toLowerCase().replace(/[^a-z_0-9]/g, " ");
-    const newValue = data.split("").join("");
+    const newValue = value?.toLowerCase().replace(/[^a-z_0-9]/g, " ");
+
     console.log(newValue)
 
     //Validate the presence of 'value' parameter
