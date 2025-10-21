@@ -374,3 +374,44 @@ export const getStringsByLanguage = (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const deleteString = (req, res) => {
+  try {
+    info("Processing request to delete string entry".blue);
+    const { value } = req.params;
+
+    const newValue = value.toLowerCase().replace(/[^a-z_0-9]/g, " ");
+
+    // Validate input
+    if (!newValue) {
+      warn("Missing string value in request params".red);
+      return res.status(400).json({ error: "Missing string value in request parameters" });
+    }
+    
+    // Normalize the input value
+  
+    const normalizedValue = newValue.toLowerCase().trim();
+
+    console.log(normalizedValue)
+    
+    const storedStrings = readStorage();
+
+
+    // Check if the string exists
+    if (!storedStrings[normalizedValue]) {
+      warn("String does not exist in the system".red);
+      return res.status(404).json({ error: "String does not exist in the system" });
+    }
+
+    // Delete the string
+    delete storedStrings[normalizedValue];
+    writeStorage(storedStrings);
+
+    info("String entry deleted successfully".green);
+    return res.status(204).send(); // No content, as specified
+
+  } catch (error) {
+    warn("Internal Server Error".red);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

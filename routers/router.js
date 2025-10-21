@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createString, getStrings, getStringsQuery, getStringsByLanguage} from "../controllers/controller.js";
+import { createString, getStrings, getStringsQuery, getStringsByLanguage, deleteString } from "../controllers/controller.js";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.get('/', getStringsQuery )
 
 router.get('/:value', getStrings);
 
-
+router.delete('/:value', deleteString);
 
 
 export default router;
