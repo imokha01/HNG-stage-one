@@ -78,8 +78,8 @@ export const createString = (req, res) => {
 
     //create the word counter function
     function wordCount(str) {
-      const words = value.trim().split(/\s+/);
-      const count = value.trim() === "" ? 0 : words.length;
+      const words = str.trim().split(/\s+/);
+      const count = str.trim() === "" ? 0 : words.length;
       return count;
     }
 
@@ -99,19 +99,22 @@ export const createString = (req, res) => {
       return freq;
     }
 
+    // Construct the `properties` object (the missing piece)
+    const properties = {
+      length: value.length,
+      is_palindrome: isPalindrome(value),
+      unique_characters: uniqueCharacterCount(value),
+      word_count: wordCount(value),
+      sha256_hash: crypto.createHash("sha256").update(value).digest("hex"),
+      character_frequency_map: charFreqCount(value)
+    };
+
     // Construct the response data object
 
     const resData = {
       id: uuid,
-      value,
-      properties: {
-        length: value.length,
-        is_palindrome: isPalindrome(value),
-        unique_characters: uniqueCharacterCount(value),
-        word_count: wordCount(value),
-        sha256_hash: hash,
-        character_frequency_map: charFreqCount(value)
-      },
+      value: normalizedValue,
+      properties,
       createdAt: new Date().toISOString()
     };
 

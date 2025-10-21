@@ -22,5 +22,42 @@
       }
     },
     "createdAt": "2025-10-21T14:00:56.490Z"
+  },
+  "son of man": {
+    "id": "eee0d1f4-9c23-47ce-a361-0ca8848c8ea8",
+    "value": "son of man",
+    "properties": {
+      "length": 10,
+      "is_palindrome": false,
+      "unique_characters": 7,
+      "word_count": 3,
+      "sha256_hash": "4bd24c42b29025a3f02b62756be316861779100ba5767d972926a8cf59af5b92",
+      "character_frequency_map": {
+        "s": 1,
+        "o": 2,
+        "n": 2,
+        "f": 1,
+        "m": 1,
+        "a": 1
+      }
+    },
+    "createdAt": "2025-10-21T16:26:32.836Z"
+  },
+  "madam": {
+    "id": "63944bb7-0d89-4115-8c0b-f38de1a4035c",
+    "value": "madam",
+    "properties": {
+      "length": 5,
+      "is_palindrome": true,
+      "unique_characters": 3,
+      "word_count": 1,
+      "sha256_hash": "765cc52b3dbc1bb8ec279ef9c8ec3d0f251c0c92a6ecdc1870be8f7dc7538b21",
+      "character_frequency_map": {
+        "m": 2,
+        "a": 2,
+        "d": 1
+      }
+    },
+    "createdAt": "2025-10-21T16:26:58.903Z"
   }
 }
