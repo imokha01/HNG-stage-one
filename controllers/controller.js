@@ -172,7 +172,7 @@ export const getStringsQuery = (req, res) => {
     info("Processing request to retrieve query string".blue);
     const { is_palindrome, min_length, max_length, word_count, contains_character } = req.query;
 
-    // --- Validate query parameter values ---
+    //! --- Validate query parameter values ---
     const numericFields = { min_length, max_length, word_count };
 
     for (const [key, value] of Object.entries(numericFields)) {
@@ -199,7 +199,7 @@ export const getStringsQuery = (req, res) => {
     // Convert stored object to array
     const stringsArray = Object.values(storedStrings);
 
-    // --- Apply filters ---
+    //! --- Apply filters ---
     const filteredResults = stringsArray.filter(entry => {
       const { value, properties } = entry;
 
@@ -227,13 +227,13 @@ export const getStringsQuery = (req, res) => {
       return true;
     });
 
-    // --- Handle no matches ---
+    //! --- Handle no matches ---
     if (filteredResults.length === 0) {
       warn("No matching string entries found".red);
       return res.status(404).json({ error: "No matching string entries found" });
     }
 
-    //---Construct response---
+    //!---Construct response---
     const response = {
       data: filteredResults.map(entry => ({
         id: entry.id,
