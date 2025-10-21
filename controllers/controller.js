@@ -165,3 +165,97 @@ export const getStrings = (req, res) => {
 
   }
 };
+
+
+export const getStringsQuery = (req, res) => {
+  try {
+    info("Processing request to retrieve query string".blue);
+    const { is_palindrome, min_length, max_length, word_count, contains_character } = req.query;
+
+    // --- Validate query parameter values ---
+    const numericFields = { min_length, max_length, word_count };
+
+    for (const [key, value] of Object.entries(numericFields)) {
+      if (value !== undefined && isNaN(Number(value))) {
+        warn(`Invalid query parameter type for '${key}': expected a number`.red);
+        return res.status(400).json({
+          error: "Bad Request: Invalid query parameter values or types",
+          details: `${key} must be a valid number`
+        });
+      }
+    }
+
+    if (is_palindrome !== undefined && !["true", "false"].includes(is_palindrome.toLowerCase())) {
+      warn("Invalid query parameter for 'is_palindrome': must be 'true' or 'false'".red);
+      return res.status(400).json({
+        error: "Bad Request: Invalid query parameter values or types",
+        details: "is_palindrome must be 'true' or 'false'"
+      });
+    }
+
+    info("Searching for string entries".blue);
+    const storedStrings = readStorage();
+
+    // Convert stored object to array
+    const stringsArray = Object.values(storedStrings);
+
+    // --- Apply filters ---
+    const filteredResults = stringsArray.filter(entry => {
+      const { value, properties } = entry;
+
+      // Palindrome filter
+      if (is_palindrome !== undefined) {
+        const boolValue = is_palindrome.toLowerCase() === "true";
+        if (properties.is_palindrome !== boolValue) return false;
+      }
+
+      // Min length
+      if (min_length && properties.length < Number(min_length)) return false;
+
+      // Max length
+      if (max_length && properties.length > Number(max_length)) return false;
+
+      // Word count
+      if (word_count && properties.word_count !== Number(word_count)) return false;
+
+      // Contains character
+      if (contains_character) {
+        const char = contains_character.toLowerCase();
+        if (!value.toLowerCase().includes(char)) return false;
+      }
+
+      return true;
+    });
+
+    // --- Handle no matches ---
+    if (filteredResults.length === 0) {
+      warn("No matching string entries found".red);
+      return res.status(404).json({ error: "No matching string entries found" });
+    }
+
+    //---Construct response---
+    const response = {
+      data: filteredResults.map(entry => ({
+        id: entry.id,
+        value: entry.value,
+        properties: entry.properties,
+        createdAt: entry.createdAt
+      })),
+      count: filteredResults.length,
+      filters_applied: {
+        is_palindrome,
+        min_length,
+        max_length,
+        word_count,
+        contains_character
+      }
+    };
+
+    info("String entries retrieved successfully".green);
+    res.status(200).json(response);
+
+  } catch (error) {
+    warn("Internal Server Error".red);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
