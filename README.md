@@ -1,4 +1,4 @@
-# 🧠 HNG-stage-one: String Analysis API
+# 🧠 String Analysis API
 
 A minimalist **Express.js backend** for analyzing, storing, filtering, and deleting strings.  
 It supports **palindrome detection**, **word counting**, and **natural language filtering** using simple heuristics.  
