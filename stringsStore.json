@@ -59,5 +59,68 @@
       }
     },
     "createdAt": "2025-10-21T16:26:58.903Z"
+  },
+  "rats live on no evil star": {
+    "id": "c03c4277-0545-4e12-b093-40ca97511ffb",
+    "value": "rats live on no evil star",
+    "properties": {
+      "length": 25,
+      "is_palindrome": true,
+      "unique_characters": 12,
+      "word_count": 6,
+      "sha256_hash": "c59d4457c396d6a64913334394acd9d2e95f7b3795c393c355dc273c1ce24d98",
+      "character_frequency_map": {
+        "r": 2,
+        "a": 2,
+        "t": 2,
+        "s": 2,
+        "l": 2,
+        "i": 2,
+        "v": 2,
+        "e": 2,
+        "o": 2,
+        "n": 2
+      }
+    },
+    "createdAt": "2025-10-27T14:56:13.511Z"
+  },
+  "hello world": {
+    "id": "8113dd39-ece7-4c62-9a1f-c19d77fd7931",
+    "value": "hello world",
+    "properties": {
+      "length": 11,
+      "is_palindrome": false,
+      "unique_characters": 8,
+      "word_count": 2,
+      "sha256_hash": "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c",
+      "character_frequency_map": {
+        "h": 1,
+        "e": 1,
+        "l": 3,
+        "o": 2,
+        "w": 1,
+        "r": 1,
+        "d": 1
+      }
+    },
+    "createdAt": "2025-10-27T15:07:44.060Z"
+  },
+  "racecar": {
+    "id": "d6c56ec8-521e-424b-b1bd-86121eb723fd",
+    "value": "racecar",
+    "properties": {
+      "length": 7,
+      "is_palindrome": true,
+      "unique_characters": 4,
+      "word_count": 1,
+      "sha256_hash": "0d85bdb2a2e4b58fa69348ee60e60b5bfba7455b2883ce114759e5d2adabcfc5",
+      "character_frequency_map": {
+        "r": 2,
+        "a": 2,
+        "c": 2,
+        "e": 1
+      }
+    },
+    "createdAt": "2025-10-27T15:09:37.458Z"
   }
 }
